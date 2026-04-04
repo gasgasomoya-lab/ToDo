@@ -5,6 +5,7 @@ import { useState, useEffect, useRef } from 'react'
 type Todo = {
   id: string
   text: string
+  time: string
   done: boolean
   createdAt: number
 }
@@ -12,6 +13,7 @@ type Todo = {
 export default function Home() {
   const [todos, setTodos] = useState<Todo[]>([])
   const [input, setInput] = useState('')
+  const [time, setTime] = useState('')
   const [mounted, setMounted] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -29,10 +31,11 @@ export default function Home() {
     const text = input.trim()
     if (!text) return
     setTodos(prev => [
-      { id: crypto.randomUUID(), text, done: false, createdAt: Date.now() },
+      { id: crypto.randomUUID(), text, time, done: false, createdAt: Date.now() },
       ...prev,
     ])
     setInput('')
+    setTime('')
     inputRef.current?.focus()
   }
 
@@ -68,23 +71,48 @@ export default function Home() {
         </div>
 
         {/* 入力フォーム */}
-        <div className="flex gap-2 mb-6">
-          <input
-            ref={inputRef}
-            type="text"
-            value={input}
-            onChange={e => setInput(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && addTodo()}
-            placeholder="新しいタスクを入力..."
-            className="flex-1 px-4 py-3 rounded-xl border border-stone-200 bg-white text-stone-800 placeholder-stone-300 text-base focus:outline-none focus:ring-2 focus:ring-stone-300 transition"
-          />
-          <button
-            onClick={addTodo}
-            disabled={!input.trim()}
-            className="px-5 py-3 rounded-xl bg-stone-800 text-white text-base font-medium hover:bg-stone-700 active:bg-stone-900 disabled:opacity-30 disabled:cursor-not-allowed transition"
-          >
-            追加
-          </button>
+        <div className="flex flex-col gap-2 mb-6">
+          <div className="flex gap-2">
+            <input
+              ref={inputRef}
+              type="text"
+              value={input}
+              onChange={e => setInput(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && addTodo()}
+              placeholder="新しいタスクを入力..."
+              className="flex-1 px-4 py-3 rounded-xl border border-stone-200 bg-white text-stone-800 placeholder-stone-300 text-base focus:outline-none focus:ring-2 focus:ring-stone-300 transition"
+            />
+            <button
+              onClick={addTodo}
+              disabled={!input.trim()}
+              className="px-5 py-3 rounded-xl bg-stone-800 text-white text-base font-medium hover:bg-stone-700 active:bg-stone-900 disabled:opacity-30 disabled:cursor-not-allowed transition"
+            >
+              追加
+            </button>
+          </div>
+
+          {/* 時間入力（任意） */}
+          <div className="flex items-center gap-2 px-1">
+            <svg className="w-4 h-4 text-stone-300 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <circle cx="12" cy="12" r="10" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2" />
+            </svg>
+            <input
+              type="time"
+              value={time}
+              onChange={e => setTime(e.target.value)}
+              className="w-36 px-3 py-2 rounded-lg border border-stone-200 bg-white text-stone-600 text-sm focus:outline-none focus:ring-2 focus:ring-stone-300 transition"
+            />
+            <span className="text-xs text-stone-300">予定時間（任意）</span>
+            {time && (
+              <button
+                onClick={() => setTime('')}
+                className="text-xs text-stone-300 hover:text-stone-500 transition"
+              >
+                クリア
+              </button>
+            )}
+          </div>
         </div>
 
         {/* タスク一覧 */}
@@ -99,7 +127,7 @@ export default function Home() {
                 key={todo.id}
                 className="flex items-center gap-3 px-3 py-3 bg-white rounded-xl border border-stone-100 hover:border-stone-200 transition"
               >
-                {/* チェックボタン：タップ領域を大きく */}
+                {/* チェックボタン */}
                 <button
                   onClick={() => toggleTodo(todo.id)}
                   className="shrink-0 w-11 h-11 flex items-center justify-center rounded-full active:bg-stone-100 transition"
@@ -118,16 +146,27 @@ export default function Home() {
                   </span>
                 </button>
 
-                {/* テキスト */}
-                <span
-                  className={`flex-1 text-sm leading-relaxed transition ${
+                {/* テキスト＋時間 */}
+                <div className="flex-1 min-w-0">
+                  <span className={`block text-sm leading-relaxed transition ${
                     todo.done ? 'text-stone-300 line-through' : 'text-stone-700'
-                  }`}
-                >
-                  {todo.text}
-                </span>
+                  }`}>
+                    {todo.text}
+                  </span>
+                  {todo.time && (
+                    <span className={`flex items-center gap-1 mt-0.5 text-xs transition ${
+                      todo.done ? 'text-stone-200' : 'text-stone-400'
+                    }`}>
+                      <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <circle cx="12" cy="12" r="10" />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2" />
+                      </svg>
+                      {todo.time}
+                    </span>
+                  )}
+                </div>
 
-                {/* 削除ボタン：常に表示・タップ領域を大きく */}
+                {/* 削除ボタン */}
                 <button
                   onClick={() => deleteTodo(todo.id)}
                   className="shrink-0 w-11 h-11 flex items-center justify-center rounded-full text-stone-300 hover:text-stone-500 active:bg-stone-100 transition"

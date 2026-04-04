@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(export PATH=\"$PATH:/c/Program Files/nodejs\")",
+      "Read(//c/Users/khs90/OneDrive/デスクトップ/moneyforward-analysis/**)",
+      "Bash(npm run:*)"
+    ]
+  }
+}
