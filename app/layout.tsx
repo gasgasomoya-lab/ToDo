@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
+import { CartProvider } from '@/lib/cartContext'
 
 export const metadata: Metadata = {
   title: 'ToDoリスト',
@@ -26,7 +27,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ja">
-      <body className="bg-stone-50 min-h-screen">{children}</body>
+      <body className="bg-stone-50 min-h-screen">
+        <CartProvider>{children}</CartProvider>
+      </body>
     </html>
   )
 }
