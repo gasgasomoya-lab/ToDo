@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ECサイト 構造説明</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Helvetica Neue', 'Hiragino Sans', 'Yu Gothic', sans-serif;
+      background: #1a1a2e;
+      color: #333;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* ===== スライドコンテナ ===== */
+    .slide-wrapper {
+      width: 900px;
+      height: 560px;
+      position: relative;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      border-radius: 16px;
+      padding: 48px 56px;
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .slide.active { display: flex; }
+
+    /* ===== ナビゲーション ===== */
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-top: 20px;
+    }
+    .nav button {
+      padding: 10px 28px;
+      border: none;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .nav button:hover { background: rgba(255,255,255,0.28); }
+    .nav button:disabled { opacity: 0.3; cursor: default; }
+    .slide-counter {
+      color: rgba(255,255,255,0.5);
+      font-size: 13px;
+      min-width: 60px;
+      text-align: center;
+    }
+
+    /* ===== スライド共通パーツ ===== */
+    .slide-num {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      opacity: 0.5;
+    }
+    h1.title {
+      font-size: 38px;
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 10px;
+    }
+    h2.heading {
+      font-size: 26px;
+      font-weight: 700;
+      margin-bottom: 24px;
+    }
+    .subtitle {
+      font-size: 16px;
+      opacity: 0.7;
+      line-height: 1.7;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 99px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    /* ===== スライド1：表紙 ===== */
+    #s1 {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      justify-content: center;
+    }
+    #s1 .tag {
+      background: rgba(255,255,255,0.2);
+      color: white;
+      padding: 6px 16px;
+      border-radius: 99px;
+      font-size: 13px;
+      display: inline-block;
+      margin-bottom: 24px;
+    }
+    #s1 h1 { font-size: 48px; margin-bottom: 16px; }
+    #s1 .tech-stack {
+      display: flex;
+      gap: 10px;
+      margin-top: 28px;
+      flex-wrap: wrap;
+    }
+    #s1 .tech-stack span {
+      background: rgba(255,255,255,0.15);
+      color: white;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    /* ===== スライド2：全体像 ===== */
+    #s2 { background: #fff; }
+    #s2 .slide-num { color: #667eea; }
+    .flow-row {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      margin-top: 28px;
+    }
+    .flow-box {
+      flex: 1;
+      background: #f8f7ff;
+      border: 2px solid #e8e4ff;
+      border-radius: 12px;
+      padding: 16px 12px;
+      text-align: center;
+    }
+    .flow-box .icon { font-size: 28px; margin-bottom: 6px; }
+    .flow-box .label { font-size: 13px; font-weight: 700; color: #4c3d9e; }
+    .flow-box .url { font-size: 11px; color: #999; margin-top: 3px; font-family: monospace; }
+    .flow-arrow {
+      font-size: 22px;
+      color: #c4b8ff;
+      padding: 0 6px;
+      flex-shrink: 0;
+    }
+    .db-box {
+      margin-top: 24px;
+      background: #fff9e6;
+      border: 2px solid #ffd966;
+      border-radius: 12px;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .db-box .icon { font-size: 24px; }
+    .db-box .label { font-size: 13px; font-weight: 700; color: #8a6a00; }
+    .db-box .desc { font-size: 12px; color: #a0841a; margin-top: 2px; }
+    .db-box .tables {
+      margin-left: auto;
+      display: flex;
+      gap: 8px;
+    }
+    .db-box .tables span {
+      background: #fff3b0;
+      color: #7a5c00;
+      border-radius: 6px;
+      padding: 3px 10px;
+      font-size: 12px;
+      font-family: monospace;
+      font-weight: 600;
+    }
+
+    /* ===== スライド3：ファイル構造 ===== */
+    #s3 { background: #0f1117; color: #e6e6e6; }
+    #s3 .slide-num { color: #56d364; }
+    #s3 h2 { color: #e6e6e6; }
+    .file-tree {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .file-tree .col { display: flex; flex-direction: column; gap: 6px; }
+    .file-item {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 12px;
+    }
+    .file-item .path { color: #79c0ff; }
+    .file-item .desc { color: #8b949e; font-size: 11px; margin-top: 2px; font-family: sans-serif; }
+    .file-item.new { border-color: #56d364; }
+    .file-item.new .path { color: #56d364; }
+    .file-item.modified { border-color: #f0a84f; }
+    .file-item.modified .path { color: #f0a84f; }
+    .legend {
+      display: flex;
+      gap: 16px;
+      margin-top: 12px;
+    }
+    .legend span {
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .dot { width: 8px; height: 8px; border-radius: 99px; flex-shrink: 0; }
+    .dot.green { background: #56d364; }
+    .dot.orange { background: #f0a84f; }
+    .dot.gray { background: #8b949e; }
+
+    /* ===== スライド4：CartContext ===== */
+    #s4 { background: #fff; }
+    #s4 .slide-num { color: #e55c5c; }
+    .cart-diagram {
+      display: flex;
+      gap: 16px;
+      margin-top: 8px;
+      align-items: flex-start;
+    }
+    .ctx-box {
+      flex: 1;
+      background: #fff5f5;
+      border: 2px solid #ffb3b3;
+      border-radius: 12px;
+      padding: 16px;
+    }
+    .ctx-box .ctx-title { font-size: 13px; font-weight: 700; color: #cc3333; margin-bottom: 10px; }
+    .ctx-method {
+      background: white;
+      border: 1px solid #ffe0e0;
+      border-radius: 6px;
+      padding: 6px 10px;
+      font-family: monospace;
+      font-size: 12px;
+      color: #cc3333;
+      margin-bottom: 4px;
+    }
+    .ctx-method span { color: #999; font-family: sans-serif; font-size: 11px; margin-left: 6px; }
+    .consumers {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .consumer-card {
+      background: #f0f7ff;
+      border: 2px solid #b3d1ff;
+      border-radius: 10px;
+      padding: 10px 14px;
+    }
+    .consumer-card .c-title { font-size: 12px; font-weight: 700; color: #1a6ac9; margin-bottom: 4px; }
+    .consumer-card .c-uses { font-size: 11px; color: #555; }
+    .consumer-card .c-uses code { background: #e8f0ff; padding: 1px 5px; border-radius: 4px; color: #1a5ab8; font-size: 11px; }
+    .arrow-mid {
+      display: flex;
+      align-items: center;
+      font-size: 24px;
+      color: #ccc;
+      padding: 0 4px;
+      align-self: center;
+    }
+    .storage-note {
+      margin-top: 12px;
+      background: #f0fff4;
+      border: 1.5px solid #68d391;
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-size: 12px;
+      color: #276749;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ===== スライド5：データフロー ===== */
+    #s5 { background: #fff; }
+    #s5 .slide-num { color: #f6a623; }
+    .flow-steps {
+      margin-top: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .flow-step {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+    .step-num {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #f6a623;
+      color: white;
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .step-content { flex: 1; }
+    .step-content .step-title { font-size: 14px; font-weight: 700; color: #333; margin-bottom: 2px; }
+    .step-content .step-desc { font-size: 12px; color: #666; line-height: 1.5; }
+    .step-content code { background: #fff3d4; padding: 1px 5px; border-radius: 4px; font-size: 12px; color: #b87000; }
+    .step-divider {
+      width: 2px;
+      height: 12px;
+      background: #ffe0a0;
+      margin-left: 13px;
+    }
+
+    /* ===== スライド6：次のステップ ===== */
+    #s6 {
+      background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+      color: white;
+    }
+    #s6 .slide-num { color: rgba(255,255,255,0.6); }
+    #s6 h2 { color: white; }
+    .next-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+      margin-top: 20px;
+    }
+    .next-card {
+      background: rgba(255,255,255,0.15);
+      border-radius: 12px;
+      padding: 16px;
+      backdrop-filter: blur(4px);
+    }
+    .next-card .step-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      opacity: 0.7;
+      margin-bottom: 8px;
+    }
+    .next-card .next-title { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+    .next-card .next-items { font-size: 12px; opacity: 0.85; line-height: 1.8; }
+  </style>
+</head>
+<body>
+
+  <div class="slide-wrapper">
+
+    <!-- ===== スライド 1：表紙 ===== -->
+    <div class="slide active" id="s1">
+      <div class="tag">学習用ドキュメント</div>
+      <h1 class="title">ECサイト<br>構造説明</h1>
+      <p class="subtitle">Next.js + Supabase で作る<br>シンプルなオンラインショップ</p>
+      <div class="tech-stack">
+        <span>Next.js 16</span>
+        <span>React 18</span>
+        <span>Supabase</span>
+        <span>Tailwind CSS</span>
+        <span>TypeScript</span>
+      </div>
+    </div>
+
+    <!-- ===== スライド 2：全体の流れ ===== -->
+    <div class="slide" id="s2">
+      <div class="slide-num">SLIDE 02 / 全体像</div>
+      <h2 class="heading">ページの流れ</h2>
+
+      <div class="flow-row">
+        <div class="flow-box">
+          <div class="icon">🏠</div>
+          <div class="label">商品一覧</div>
+          <div class="url">/shop</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box">
+          <div class="icon">🔍</div>
+          <div class="label">商品詳細</div>
+          <div class="url">/shop/[id]</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box">
+          <div class="icon">🛒</div>
+          <div class="label">カート</div>
+          <div class="url">/shop/cart</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box">
+          <div class="icon">✅</div>
+          <div class="label">注文確定</div>
+          <div class="url">（画面表示）</div>
+        </div>
+      </div>
+
+      <div class="db-box">
+        <div class="icon">🗄️</div>
+        <div>
+          <div class="label">Supabase（データベース）</div>
+          <div class="desc">商品情報を保存・取得する。Supabaseにデータがない場合はサンプルデータを使用。</div>
+        </div>
+        <div class="tables">
+          <span>products</span>
+          <span>todos</span>
+        </div>
+      </div>
+
+      <p style="font-size:12px; color:#aaa; margin-top:14px;">
+        ※ カートのデータは <strong>localStorage</strong>（ブラウザのメモリ）に保存されます。ページを閉じても消えません。
+      </p>
+    </div>
+
+    <!-- ===== スライド 3：ファイル構造 ===== -->
+    <div class="slide" id="s3">
+      <div class="slide-num">SLIDE 03 / ファイル構造</div>
+      <h2 class="heading" style="color:#e6e6e6;">今回追加・変更したファイル</h2>
+
+      <div class="file-tree">
+        <div class="col">
+          <div class="file-item new">
+            <div class="path">app/shop/page.tsx</div>
+            <div class="desc">商品一覧ページ（カテゴリ絞り込み付き）</div>
+          </div>
+          <div class="file-item new">
+            <div class="path">app/shop/[id]/page.tsx</div>
+            <div class="desc">商品詳細ページ（カートに追加ボタン）</div>
+          </div>
+          <div class="file-item new">
+            <div class="path">app/shop/cart/page.tsx</div>
+            <div class="desc">カートページ（数量変更・合計・注文）</div>
+          </div>
+          <div class="file-item new">
+            <div class="path">app/shop/layout.tsx</div>
+            <div class="desc">ショップ共通ヘッダー（カートバッジ）</div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="file-item new">
+            <div class="path">lib/cartContext.tsx</div>
+            <div class="desc">カートのグローバルstate管理（Context）</div>
+          </div>
+          <div class="file-item new">
+            <div class="path">app/shop/_components/<br>ShopHeader.tsx</div>
+            <div class="desc">ヘッダーUIコンポーネント</div>
+          </div>
+          <div class="file-item new">
+            <div class="path">supabase/products.sql</div>
+            <div class="desc">DBテーブル作成 + サンプルデータSQL</div>
+          </div>
+          <div class="file-item modified">
+            <div class="path">app/layout.tsx</div>
+            <div class="desc">CartProviderを追加（変更済み）</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="legend">
+        <span><div class="dot green"></div> 新規作成</span>
+        <span><div class="dot orange"></div> 変更</span>
+        <span><div class="dot gray"></div> 既存（変更なし）</span>
+      </div>
+    </div>
+
+    <!-- ===== スライド 4：CartContext ===== -->
+    <div class="slide" id="s4">
+      <div class="slide-num">SLIDE 04 / カート管理</div>
+      <h2 class="heading">CartContext — カート情報を全ページで共有する仕組み</h2>
+
+      <div class="cart-diagram">
+        <div class="ctx-box">
+          <div class="ctx-title">CartContext が持つ機能</div>
+          <div class="ctx-method">addItem( ) <span>→ カートに追加</span></div>
+          <div class="ctx-method">removeItem( ) <span>→ 削除</span></div>
+          <div class="ctx-method">updateQuantity( ) <span>→ 数量変更</span></div>
+          <div class="ctx-method">clearCart( ) <span>→ 全削除</span></div>
+          <div class="ctx-method">totalCount <span>→ 合計個数</span></div>
+          <div class="ctx-method">totalPrice <span>→ 合計金額</span></div>
+        </div>
+
+        <div class="arrow-mid">→</div>
+
+        <div class="consumers">
+          <div class="consumer-card">
+            <div class="c-title">ShopHeader.tsx（ヘッダー）</div>
+            <div class="c-uses"><code>totalCount</code> を使ってバッジに個数を表示</div>
+          </div>
+          <div class="consumer-card">
+            <div class="c-title">商品詳細ページ</div>
+            <div class="c-uses"><code>addItem</code> でカートに追加</div>
+          </div>
+          <div class="consumer-card">
+            <div class="c-title">カートページ</div>
+            <div class="c-uses"><code>items</code> <code>updateQuantity</code> <code>removeItem</code> を使用</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="storage-note">
+        <span>💾</span>
+        <span>カートの中身は <strong>localStorage</strong> に自動保存されます。ページをリロードしても消えません。</span>
+      </div>
+    </div>
+
+    <!-- ===== スライド 5：データの流れ ===== -->
+    <div class="slide" id="s5">
+      <div class="slide-num">SLIDE 05 / データフロー</div>
+      <h2 class="heading">商品をカートに入れるまでの流れ</h2>
+
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <div class="step-title">Supabaseから商品データを取得</div>
+            <div class="step-desc"><code>supabase.from('products').select('*')</code> を実行。データがなければサンプルデータを使用。</div>
+          </div>
+        </div>
+        <div class="step-divider"></div>
+        <div class="flow-step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <div class="step-title">商品一覧ページに表示</div>
+            <div class="step-desc">カテゴリで絞り込みできる。商品カードをクリックすると詳細ページへ。</div>
+          </div>
+        </div>
+        <div class="step-divider"></div>
+        <div class="flow-step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <div class="step-title">詳細ページで「カートに追加」をクリック</div>
+            <div class="step-desc"><code>addItem(product)</code> が呼ばれ、CartContextのstateが更新される。ヘッダーのバッジが即座に増える。</div>
+          </div>
+        </div>
+        <div class="step-divider"></div>
+        <div class="flow-step">
+          <div class="step-num">4</div>
+          <div class="step-content">
+            <div class="step-title">カートページで確認・注文</div>
+            <div class="step-desc">数量の変更・削除ができる。「注文を確定する」でカートが空になり、完了画面が表示される。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== スライド 6：次のステップ ===== -->
+    <div class="slide" id="s6">
+      <div class="slide-num">SLIDE 06 / 次のステップ</div>
+      <h2 class="heading">これから追加できる機能</h2>
+
+      <div class="next-grid">
+        <div class="next-card">
+          <div class="step-label">STEP 1 — 基礎</div>
+          <div class="next-title">商品管理</div>
+          <div class="next-items">
+            · 管理者画面から商品登録<br>
+            · 画像アップロード<br>
+            · 在庫の増減
+          </div>
+        </div>
+        <div class="next-card">
+          <div class="step-label">STEP 2 — ユーザー</div>
+          <div class="next-title">認証機能</div>
+          <div class="next-items">
+            · Supabase Authでログイン<br>
+            · 注文履歴の保存<br>
+            · お気に入り機能
+          </div>
+        </div>
+        <div class="next-card">
+          <div class="step-label">STEP 3 — 決済</div>
+          <div class="next-title">Stripe連携</div>
+          <div class="next-items">
+            · クレジットカード決済<br>
+            · 注文確認メール<br>
+            · 売上管理ダッシュボード
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /slide-wrapper -->
+
+  <!-- ナビゲーションボタン -->
+  <div class="nav">
+    <button id="prevBtn" onclick="changeSlide(-1)" disabled>← 前へ</button>
+    <span class="slide-counter" id="counter">1 / 6</span>
+    <button id="nextBtn" onclick="changeSlide(1)">次へ →</button>
+  </div>
+
+  <script>
+    let current = 0
+    const slides = document.querySelectorAll('.slide')
+    const total = slides.length
+
+    function changeSlide(dir) {
+      slides[current].classList.remove('active')
+      current = Math.max(0, Math.min(total - 1, current + dir))
+      slides[current].classList.add('active')
+      document.getElementById('counter').textContent = `${current + 1} / ${total}`
+      document.getElementById('prevBtn').disabled = current === 0
+      document.getElementById('nextBtn').disabled = current === total - 1
+    }
+
+    // キーボード操作対応
+    document.addEventListener('keydown', e => {
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') changeSlide(1)
+      if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   changeSlide(-1)
+    })
+  </script>
+</body>
+</html>
