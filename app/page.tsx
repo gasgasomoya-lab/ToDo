@@ -7,6 +7,7 @@ type Todo = {
   id: string
   text: string
   time: string
+  date: string
   done: boolean
   created_at: number
 }
@@ -25,6 +26,7 @@ export default function Home() {
   const [todos, setTodos] = useState<Todo[]>([])
   const [input, setInput] = useState('')
   const [time, setTime] = useState('')
+  const [date, setDate] = useState('')
   const [syncId, setSyncId] = useState('')
   const [inputSyncId, setInputSyncId] = useState('')
   const [showSyncPanel, setShowSyncPanel] = useState(false)
@@ -78,12 +80,14 @@ export default function Home() {
       user_id: syncId,
       text,
       time,
+      date,
       done: false,
       created_at: Date.now(),
     }
     setTodos(prev => [newTodo, ...prev])
     setInput('')
     setTime('')
+    setDate('')
     inputRef.current?.focus()
     await supabase.from('todos').insert(newTodo)
   }
@@ -228,24 +232,41 @@ export default function Home() {
             </button>
           </div>
 
-          {/* 時間入力（任意） */}
-          <div className="flex items-center gap-2 px-1">
-            <svg className="w-4 h-4 text-stone-300 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <circle cx="12" cy="12" r="10" />
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2" />
-            </svg>
-            <input
-              type="time"
-              value={time}
-              onChange={e => setTime(e.target.value)}
-              className="w-36 px-3 py-2 rounded-lg border border-stone-200 bg-white text-stone-600 text-sm focus:outline-none focus:ring-2 focus:ring-stone-300 transition"
-            />
-            <span className="text-xs text-stone-300">予定時間（任意）</span>
-            {time && (
-              <button onClick={() => setTime('')} className="text-xs text-stone-300 hover:text-stone-500 transition">
-                クリア
-              </button>
-            )}
+          {/* 日付・時間入力（任意） */}
+          <div className="flex flex-wrap items-center gap-3 px-1">
+            {/* 日付 */}
+            <div className="flex items-center gap-1.5">
+              <svg className="w-4 h-4 text-stone-300 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <rect x="3" y="4" width="18" height="18" rx="2" />
+                <path strokeLinecap="round" d="M16 2v4M8 2v4M3 10h18" />
+              </svg>
+              <input
+                type="date"
+                value={date}
+                onChange={e => setDate(e.target.value)}
+                className="px-3 py-2 rounded-lg border border-stone-200 bg-white text-stone-600 text-sm focus:outline-none focus:ring-2 focus:ring-stone-300 transition"
+              />
+              {date && (
+                <button onClick={() => setDate('')} className="text-xs text-stone-300 hover:text-stone-500 transition">✕</button>
+              )}
+            </div>
+            {/* 時間 */}
+            <div className="flex items-center gap-1.5">
+              <svg className="w-4 h-4 text-stone-300 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <circle cx="12" cy="12" r="10" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2" />
+              </svg>
+              <input
+                type="time"
+                value={time}
+                onChange={e => setTime(e.target.value)}
+                className="px-3 py-2 rounded-lg border border-stone-200 bg-white text-stone-600 text-sm focus:outline-none focus:ring-2 focus:ring-stone-300 transition"
+              />
+              {time && (
+                <button onClick={() => setTime('')} className="text-xs text-stone-300 hover:text-stone-500 transition">✕</button>
+              )}
+            </div>
+            {!date && !time && <span className="text-xs text-stone-300">日付・時間は任意</span>}
           </div>
         </div>
 
@@ -285,15 +306,28 @@ export default function Home() {
                   }`}>
                     {todo.text}
                   </span>
-                  {todo.time && (
-                    <span className={`flex items-center gap-1 mt-0.5 text-xs transition ${
+                  {(todo.date || todo.time) && (
+                    <span className={`flex items-center gap-2 mt-0.5 text-xs transition ${
                       todo.done ? 'text-stone-200' : 'text-stone-400'
                     }`}>
-                      <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <circle cx="12" cy="12" r="10" />
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2" />
-                      </svg>
-                      {todo.time}
+                      {todo.date && (
+                        <span className="flex items-center gap-1">
+                          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <rect x="3" y="4" width="18" height="18" rx="2" />
+                            <path strokeLinecap="round" d="M16 2v4M8 2v4M3 10h18" />
+                          </svg>
+                          {todo.date.replace(/^(\d{4})-(\d{2})-(\d{2})$/, '$1/$2/$3')}
+                        </span>
+                      )}
+                      {todo.time && (
+                        <span className="flex items-center gap-1">
+                          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <circle cx="12" cy="12" r="10" />
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2" />
+                          </svg>
+                          {todo.time}
+                        </span>
+                      )}
                     </span>
                   )}
                 </div>
